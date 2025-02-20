@@ -11,16 +11,16 @@ teCalc = javaObject('infodynamics.measures.continuous.kraskov.TransferEntropyCal
 
 % Set the parameters for the calculation of the transfer entropy
 % 
-k = 2;  
+k = *;  % Please replace '*' with an appropriate number
 % k is history Length: These parameters represent the number of past observations in the time series to consider. 
 % Given the 2-second TR and the slow nature of hemodynamic responses in BOLD fMRI, a longer history might be necessary to capture relevant information.
 
-l = 2;  
+l = *; % Please replace '*' with an appropriate number
 % l is target History Length
 % You might start with values like `k = 2` and `l = 2` or `k = 3` and `l = 3`. This means considering 4-6 seconds of past data, which should align with the slow hemodynamic changes captured in BOLD signals.
-delay = 3;  
+delay = *; % Please replace '*' with an appropriate number
 
-% delay:This parameter represents the time lag between the cause and effect in the information transfer.
+% delay: This parameter represents the time lag between the cause and effect in the information transfer.
 % Given the TR of 2 seconds, you might start with a `delay` of 1, which corresponds to the TR itself, accounting for immediate or very short-term interactions.
 % However, considering the delayed nature of BOLD responses to neural activity, you could also test a `delay` of 2 or 3 (4-6 seconds), to capture more delayed effects.
 
