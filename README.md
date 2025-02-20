@@ -1,4 +1,4 @@
-# Transfer-Entropy
+# Transfer-Entropy for resting-state/ sleeping state BOLD-EPI
 The code for calculating the transfer entropy between various brain regions in the BOLD-EPI sequence was implemented using the Kozachenko-Leonenko and Kraskov-Stögbauer-Grassberger from the Java Information Dynamics Toolkit (JIDT).
 1. You need to prepare the preprocessed BOLD-EPI data.  
 2. You need to extract the time series for each brain region in the atlas you are using and organize them in a format where rows represent brain region labels and columns represent time series. Save this data as a `ROISignals_*.mat` file.  
