@@ -1,1 +1,41 @@
+#This code is designed for MATLAB 2017b and utilizes the KSG estimator from JIDT. Shishun Fu wrote the code. 
+#This code will calculate the Transfer Entropy for the time series of each brain region in the AAL atlas.
+clear
+clc
+% Add JIDT jar to Java path
+if ~ismember('',javaclasspath) % Replace with your folder path (eg.D:\Downloads\infodynamics-dist-1.6.1\infodynamics.jar)
+    javaaddpath('') % Replace with your folder path (eg. D:\Downloads\infodynamics-dist-1.6.1\infodynamics.jar)
+end
 
+% Specify the folder path
+folderPath = ''; % Replace with your folder path(eg.D:\yourexamplefile\ROISignals )
+
+% Get a list of all files in the folder
+files = dir(fullfile(folderPath, '*.*')); % '*.*' lists all files
+
+% Filter out any directories
+files = files(~[files.isdir]);
+
+% Extract the full paths of the files
+filePaths = fullfile(folderPath, {files.name});
+
+% Define the directory where you want to save TE matrices
+outputDir = ''; %(D:\yourexamplefile\TEMatrix)
+% Create the directory if it doesn't exist
+if ~exist(outputDir, 'dir')
+    mkdir(outputDir);
+end
+
+for i = 1:length(filePaths)
+    a = filePaths{i};
+    load(a)
+    computeTE
+    % Create a filename for each TE matrix
+    filename = fullfile(outputDir, sprintf('TEMatrix_%d.mat', i));
+
+    % Save the TE matrix in the created directory
+    save(filename, 'TEMatrix');
+end
+
+% Clean up the parallel pool
+delete(gcp('nocreate'));
