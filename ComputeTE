@@ -1,0 +1,60 @@
+# This code will calculate the Transfer Entropy for the time series of each brain region in the atlas.
+# Before starting the calculation, please organize the ROISignals.mat file with rows representing brain regions and columns representing time series.
+
+% define data
+data = transpose(ROISignals);
+% Obtain the number and time points and number of brain regions
+[numRegions, numTimePoints] = size(data);
+
+% Create an instance of the Transfer Entropy Calculator
+teCalc = javaObject('infodynamics.measures.continuous.kraskov.TransferEntropyCalculatorKraskov');
+
+% Set the parameters for the calculation of the transfer entropy
+% 
+k = 2;  
+% k is history Length: These parameters represent the number of past observations in the time series to consider. 
+% Given the 2-second TR and the slow nature of hemodynamic responses in BOLD fMRI, a longer history might be necessary to capture relevant information.
+
+l = 2;  
+% l is target History Length
+% You might start with values like `k = 2` and `l = 2` or `k = 3` and `l = 3`. This means considering 4-6 seconds of past data, which should align with the slow hemodynamic changes captured in BOLD signals.
+delay = 3;  
+
+% delay:This parameter represents the time lag between the cause and effect in the information transfer.
+% Given the TR of 2 seconds, you might start with a `delay` of 1, which corresponds to the TR itself, accounting for immediate or very short-term interactions.
+% However, considering the delayed nature of BOLD responses to neural activity, you could also test a `delay` of 2 or 3 (4-6 seconds), to capture more delayed effects.
+
+teCalc.setProperty('k', num2str(k));
+teCalc.setProperty('l', num2str(l));
+teCalc.setProperty('delay', num2str(delay));
+
+% Initialize a matrix to store the transfer entropy results
+TEMatrix = zeros(numRegions, numRegions);
+
+% Parallel Pool Initialization
+if isempty(gcp('nocreate'))
+    parpool; % Start a parallel pool
+end
+
+% Parallel computation of transfer entropy
+parfor i = 1:numRegions
+    if ~ismember('F:\Downloads\infodynamics-dist-1.6.1\infodynamics.jar', javaclasspath)
+        javaaddpath('F:\Downloads\infodynamics-dist-1.6.1\infodynamics.jar');
+    end
+    for j = 1:numRegions
+        if i ~= j
+            % Create a local instance of the calculator for each worker
+            localTeCalc = javaObject('infodynamics.measures.continuous.kraskov.TransferEntropyCalculatorKraskov');
+            localTeCalc.setProperty('k', num2str(k));
+            localTeCalc.setProperty('l', num2str(l));
+            localTeCalc.setProperty('delay', num2str(delay));
+            
+            % Initialize calculator and provide data
+            localTeCalc.initialise();
+            localTeCalc.setObservations(data(i, :)', data(j, :)');
+
+            % Compute transfer entropy
+            TEMatrix(i, j) = localTeCalc.computeAverageLocalOfObservations();
+        end
+    end
+end
