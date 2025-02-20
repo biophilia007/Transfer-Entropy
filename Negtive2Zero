@@ -1,0 +1,15 @@
+% This code will set all negative values in the matrix to 0
+files = dir(''); % Replace with your TEMatrix folder
+for idx = 1:length(files)
+    fileName = fullfile(files(idx).folder, files(idx).name);
+    data = load(fileName);
+    fieldNames = fieldnames(data);
+    
+    for j = 1:length(fieldNames)
+        matrix = data.(fieldNames{j});
+        matrix(matrix < 0) = 0;  % Replace negative values with zero
+        data.(fieldNames{j}) = matrix;
+    end
+    
+    save(fileName, '-struct', 'data');  % Save the modified matrix back to the file
+end
